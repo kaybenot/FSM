@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using System.Linq;
 using UnityEngine;
-using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 public class Graph
 {
@@ -32,6 +31,101 @@ public class Graph
     public Color nodeColor = Color.green;
     public Color edgeColor = Color.blue;
     public float nodeSize = 0.1f;
+
+    public List<Vector2> AStar(Vector2 start, Vector2 goal)
+    {
+        if (!nodes.ContainsKey(start) || !nodes.ContainsKey(goal))
+        {
+            Debug.LogError("Start or goal node does not exist in the graph.");
+            return null;
+        }
+
+        Node startNode = nodes[start];
+        Node goalNode = nodes[goal];
+
+        var openSet = new SortedSet<Node>(Comparer<Node>.Create((a, b) => a.F.CompareTo(b.F)));
+        var closedSet = new HashSet<Node>();
+
+        startNode.G = 0;
+        startNode.H = Heuristic(startNode.Position, goalNode.Position);
+
+        openSet.Add(startNode);
+
+        Dictionary<Node, Node> cameFrom = new Dictionary<Node, Node>();
+
+        while (openSet.Count > 0)
+        {
+            Node current = openSet.First();
+            openSet.Remove(current);
+
+            if (current == goalNode)
+            {
+                return ReconstructPath(cameFrom, current);
+            }
+
+            closedSet.Add(current);
+
+            foreach (var neighbor in GetNeighbors(current))
+            {
+                if (closedSet.Contains(neighbor)) continue;
+
+                float tentativeG = current.G + Vector2.Distance(current.Position, neighbor.Position);
+
+                if (!openSet.Contains(neighbor))
+                {
+                    neighbor.G = tentativeG;
+                    neighbor.H = Heuristic(neighbor.Position, goalNode.Position);
+                    openSet.Add(neighbor);
+                    cameFrom[neighbor] = current;
+                }
+                else if (tentativeG < neighbor.G)
+                {
+                    // Update G cost and adjust position in the sorted set
+                    openSet.Remove(neighbor);
+                    neighbor.G = tentativeG;
+                    cameFrom[neighbor] = current;
+                    openSet.Add(neighbor);
+                }
+            }
+        }
+
+        Debug.LogError("No path found.");
+        return null;
+    }
+
+    private List<Vector2> ReconstructPath(Dictionary<Node, Node> cameFrom, Node current)
+    {
+        var path = new List<Vector2> { current.Position };
+
+        while (cameFrom.ContainsKey(current))
+        {
+            current = cameFrom[current];
+            path.Add(current.Position);
+        }
+
+        path.Reverse();
+        return path;
+    }
+
+    private IEnumerable<Node> GetNeighbors(Node node)
+    {
+        foreach (var edge in edges)
+        {
+            if (edge.Item1 == node && canReach(node.Position, edge.Item2.Position))
+            {
+                yield return edge.Item2;
+            }
+            else if (edge.Item2 == node && canReach(node.Position, edge.Item1.Position))
+            {
+                yield return edge.Item1;
+            }
+        }
+    }
+
+    private float Heuristic(Vector2 a, Vector2 b)
+    {
+        return Vector2.Distance(a, b);
+    }
 }
 
 public class Node
