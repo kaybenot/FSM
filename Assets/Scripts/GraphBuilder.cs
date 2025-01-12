@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class GraphBuilder : MonoBehaviour
 {
-    public Graph graph;
+    public Graph graph = new();
     private float dist = 1.5f;
     private Vector2[] directions;
 

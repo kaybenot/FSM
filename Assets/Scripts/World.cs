@@ -4,6 +4,7 @@ public class World : MonoBehaviour
 {
     GraphBuilder builder;
     Graph graph;
+    
     public void Awake()
     {
         graph = new Graph();

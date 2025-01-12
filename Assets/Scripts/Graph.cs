@@ -7,6 +7,13 @@ public class Graph
     public Dictionary<Vector2, Node> nodes = new Dictionary<Vector2, Node>();
     public List<(Node, Node)> edges = new List<(Node, Node)>();
     public float agentWidth = 0.5f;
+    
+    public static Graph Instance { get; private set; }
+
+    public Graph()
+    {
+        Instance = this;
+    }
 
     public void AddNode(Vector2 position)
     {
