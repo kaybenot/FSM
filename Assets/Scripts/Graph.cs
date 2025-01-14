@@ -35,20 +35,37 @@ public class Graph
         return hit.collider == null;
     }
 
+    public Vector2 GetNearestNode(Vector2 position)
+    {
+        Node closest = null;
+        foreach (var (pos, node) in nodes)
+        {
+            if (closest == null || Vector2.Distance(pos, position) < Vector2.Distance(closest.Position, position))
+            {
+                closest = node;
+            }
+        }
+
+        return closest?.Position ?? Vector2.negativeInfinity;
+    }
+
     public Color nodeColor = Color.green;
     public Color edgeColor = Color.blue;
     public float nodeSize = 0.1f;
 
     public List<Vector2> AStar(Vector2 start, Vector2 goal)
     {
-        if (!nodes.ContainsKey(start) || !nodes.ContainsKey(goal))
+        start = GetNearestNode(start);
+        goal = GetNearestNode(goal);
+
+        if (start == Vector2.negativeInfinity || goal == Vector2.negativeInfinity)
         {
-            Debug.LogError("Start or goal node does not exist in the graph.");
+            Debug.LogError("Start or Goal node was not found!");
             return null;
         }
 
-        Node startNode = nodes[start];
-        Node goalNode = nodes[goal];
+        var startNode = nodes[start];
+        var goalNode = nodes[goal];
 
         var openSet = new SortedSet<Node>(Comparer<Node>.Create((a, b) => a.F.CompareTo(b.F)));
         var closedSet = new HashSet<Node>();
@@ -58,11 +75,11 @@ public class Graph
 
         openSet.Add(startNode);
 
-        Dictionary<Node, Node> cameFrom = new Dictionary<Node, Node>();
+        var cameFrom = new Dictionary<Node, Node>();
 
         while (openSet.Count > 0)
         {
-            Node current = openSet.First();
+            var current = openSet.First();
             openSet.Remove(current);
 
             if (current == goalNode)
@@ -76,7 +93,7 @@ public class Graph
             {
                 if (closedSet.Contains(neighbor)) continue;
 
-                float tentativeG = current.G + Vector2.Distance(current.Position, neighbor.Position);
+                var tentativeG = current.G + Vector2.Distance(current.Position, neighbor.Position);
 
                 if (!openSet.Contains(neighbor))
                 {

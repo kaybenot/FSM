@@ -12,7 +12,7 @@ public class Agent : MonoBehaviour
     [field: SerializeField] public int Armor { get; set; } = 0;
     [field: SerializeField] public float Speed { get; set; } = 1f;
 
-    public Vector2 Position => new Vector2(transform.position.x, transform.position.z);
+    public Vector2 Position => transform.position;
 
     public Action OnDeath { get; set; }
     
@@ -37,7 +37,13 @@ public class Agent : MonoBehaviour
         currentState = fsm.GetStateName();
         
         var direction = (moveGoal - Position).normalized;
-        transform.position += new Vector3(direction.x, 0f, direction.y) * Speed * Time.deltaTime;
+        var distance = (moveGoal - Position).magnitude;
+        var step = direction * Speed * Time.deltaTime;
+        if (distance < step.magnitude)
+        {
+            step = step.normalized * distance;
+        }
+        transform.position += (Vector3)step;
     }
 
     public void MoveTo(Vector2 position)

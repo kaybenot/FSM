@@ -31,6 +31,7 @@ public class SearchEnemy : State<Agent>
         if (positionsToGo.Count <= 0)
         {
             obj.GetFSM().ChangeState(new SearchEnemy());
+            return;
         }
 
         var target = positionsToGo[0];
