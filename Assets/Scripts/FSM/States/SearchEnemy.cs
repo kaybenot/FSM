@@ -28,6 +28,12 @@ public class SearchEnemy : State<Agent>
 
     public override void Execute(Agent obj)
     {
+        if (obj.SeeEnemy().DoSee)
+        {
+            obj.GetFSM().ChangeState(new Fight());
+            return;
+        }
+        
         if (positionsToGo.Count <= 0)
         {
             obj.GetFSM().ChangeState(new SearchEnemy());

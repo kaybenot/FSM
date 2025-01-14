@@ -13,11 +13,13 @@ public class Spawner : MonoBehaviour
     public void Spawn()
     {
         var agent = Instantiate(agentPrefab, transform.position, Quaternion.identity).GetComponent<Agent>();
+        World.Instance.Agents.Add(agent);
         agent.OnDeath += AgentDied;
     }
 
-    private void AgentDied()
+    private void AgentDied(Agent agent)
     {
         Spawn();
+        World.Instance.Agents.Remove(agent);
     }
 }
