@@ -5,22 +5,31 @@ public class Projectile : MonoBehaviour
 {
     private float speed;
     private Vector2 direction;
-    private float lifeTime;
-    private float start;
     private Agent agent;
 
-    public void SetState(float _speed, Vector2 _direction, float _lifeTime, Agent _agent)
+    public void SetState(float _speed, Vector2 _direction, Agent _agent)
     {
         speed = _speed;
         direction = _direction;
-        lifeTime = _lifeTime;
         agent = _agent;
-        start = Time.time;
+    }
+
+    public bool CollidesWithWall()
+    {
+        foreach (var wall in World.Instance.Walls)
+        {
+            if (wall.Bounds.Contains(transform.position))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void Update()
     {
-        if (start + lifeTime < Time.time)
+        if (CollidesWithWall())
         {
             Destroy(gameObject);
         }

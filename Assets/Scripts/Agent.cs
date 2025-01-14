@@ -89,12 +89,10 @@ public class Agent : MonoBehaviour
         lastShootTime = Time.time;
         
         var direction = (agent.Position - Position).normalized;
-        var distance = (agent.Position - Position).magnitude + 0.25f;
         var speed = 20f;
-        var lifetime = distance / speed;
 
         var projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity).GetComponent<Projectile>();
-        projectile.SetState(speed, direction, lifetime, agent);
+        projectile.SetState(speed, direction, agent);
     }
 
     public void Die()

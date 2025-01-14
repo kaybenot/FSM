@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class World : MonoBehaviour
 {
     public List<Agent> Agents { get; } = new();
+    public List<Wall> Walls { get; private set; } = new();
 
     GraphBuilder builder;
     Graph graph;
@@ -18,5 +20,7 @@ public class World : MonoBehaviour
         builder = FindAnyObjectByType<GraphBuilder>();
         builder.Initialize(graph);
         builder.fillGraph(Vector2.zero);
+
+        Walls = FindObjectsByType<Wall>(FindObjectsInactive.Exclude, FindObjectsSortMode.None).ToList();
     }
 }
